@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RegistrationRequest;
+use App\Http\Requests\LoginRequest;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Js;
@@ -14,9 +15,18 @@ class AuthController extends Controller
      * Login Method
      */
 
-     public function login()
+     public function login(LoginRequest $request)
      {
-         //
+         $token = auth()->attempt($request->validated());
+
+         if ($token) {
+             return $this->responseWithToken($token, auth()->user());
+         } else {
+             return response()->json([
+                 'status' => 'failed',
+                 'massage' => 'Invalid credentials',
+             ], 401);
+         }
      }
 
      /**
