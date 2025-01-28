@@ -8,9 +8,14 @@ use App\Http\Requests\LoginRequest;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Js;
+use App\Customs\Services\EmailVerificationService;
 
 class AuthController extends Controller
 {
+    public function __construct(private EmailVerificationService $service)
+    {
+        
+    }
     /***
      * Login Method
      */
@@ -38,6 +43,7 @@ class AuthController extends Controller
           $user = User::create($request->validated());
 
           if ($user) {
+            $this->service->sendVerificationLink($user);
              $token = auth()->login($user);
              return $this->responseWithToken($token, $user);
           } else {
