@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Js;
 use App\Customs\Services\EmailVerificationService;
+use App\Http\Requests\ResendEmailVerificationLinkRequest;
 use Illuminate\Auth\Notifications\VerifyEmail;
 
 class AuthController extends Controller
@@ -33,6 +34,14 @@ class AuthController extends Controller
         }
     }
 
+    /**
+     * Resend Verification Link
+     */
+
+     public function resendEmailVerificationLink(ResendEmailVerificationLinkRequest $request)
+     {
+         return $this->service->resendVerificationLink($request->email);
+     }
     /**
      * Verify User Email
      */

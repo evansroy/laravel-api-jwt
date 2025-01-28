@@ -19,6 +19,24 @@ class EmailVerificationService
     }
 
     /**
+     * Resend Link with Token
+     */
+    public function resendVerificationLink(string $email) {
+        $user = User::where('email', $email)->first();
+        if ($user) {
+            $this->sendVerificationLink($user);
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Verification link sent successfully'
+            ]);
+        }else {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'User not found'
+            ]);
+        }
+    }
+    /**
      * Check if user has Already verified email
      */
     public function checkIfEmailIsVerified(object $user) {
@@ -54,7 +72,7 @@ class EmailVerificationService
        } else{
            return response()->json([
                'status' => 'failed',
-               'message' => 'Email verification failed, Please try againlater'
+               'message' => 'Email verification failed, Please try again later'
            ]);
        }
        
@@ -69,6 +87,7 @@ class EmailVerificationService
            if($token->expires_at < now()) {
                return $token;
            } else {
+                $token->delete();
                response()->json([
                    'status' => 'failed',
                    'message' => 'Token expired'
