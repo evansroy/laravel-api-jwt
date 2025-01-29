@@ -22,26 +22,38 @@ class AuthController extends Controller
 
     public function login(LoginRequest $request)
     {
-        $token = auth()->attempt($request->validated());
+        $credentials = $request->validated();
 
-        if ($token) {
-            return $this->responseWithToken($token, auth()->user());
-        } else {
+        // Attempt authentication
+        if (!$token = auth()->attempt($credentials)) {
             return response()->json([
                 'status' => 'failed',
-                'massage' => 'Invalid credentials',
+                'message' => 'Invalid credentials',
             ], 401);
         }
+
+        $user = auth()->user();
+
+        // Check if the user is verified
+        if (is_null($user->email_verified_at)) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'Your email is not verified. Please verify your email before logging in.',
+            ], 403);
+        }
+
+        return $this->responseWithToken($token, $user);
     }
+
 
     /**
      * Resend Verification Link
      */
 
-     public function resendEmailVerificationLink(ResendEmailVerificationLinkRequest $request)
-     {
-         return $this->service->resendVerificationLink($request->email);
-     }
+    public function resendEmailVerificationLink(ResendEmailVerificationLinkRequest $request)
+    {
+        return $this->service->resendVerificationLink($request->email);
+    }
     /**
      * Verify User Email
      */
