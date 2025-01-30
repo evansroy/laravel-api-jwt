@@ -200,4 +200,13 @@ class AuthController extends Controller
             'type' => 'bearer',
         ]);
     }
+
+    public function logout()
+    {
+        auth()->logout();
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Successfully logged out',
+        ]);
+    }
 }
